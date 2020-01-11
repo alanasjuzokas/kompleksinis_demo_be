@@ -35,13 +35,7 @@ Response:
 ### Get poll results
 
 ```
-GET https://fierce-waters-74037.herokuapp.com/v1/results
-
-Payload: 
-
-{
-    "pollId": "e532ab6f-0357-45ec-8ef5-a8854588a7ad",
-}
+GET https://fierce-waters-74037.herokuapp.com/v1/{pollId}/results
 
 Response:
 {
@@ -77,13 +71,7 @@ Response:
 ### Get poll 
 
 ```
-GET https://fierce-waters-74037.herokuapp.com/v1/poll
-
-Payload: 
-
-{
-    "pollId": "e532ab6f-0357-45ec-8ef5-a8854588a7ad",
-}
+GET https://fierce-waters-74037.herokuapp.com/v1/{pollId}
 
 Response:
 {

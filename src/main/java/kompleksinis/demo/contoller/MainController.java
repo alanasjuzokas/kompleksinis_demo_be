@@ -48,9 +48,9 @@ public class MainController {
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping(path = "/results")
-    public ResponseEntity<Results> getVoteResults(@RequestBody PollRequest request) {
-        Poll poll = repository.findById(request.getPollId()).orElseThrow(NoSuchElementException::new);
+    @GetMapping(path = "{pollId}/results")
+    public ResponseEntity<Results> getVoteResults(@PathVariable String pollId) {
+        Poll poll = repository.findById(pollId).orElseThrow(NoSuchElementException::new);
         Results response = new Results(poll.getYes(), poll.getNo());
         return new ResponseEntity(response, HttpStatus.OK);
     }
@@ -61,9 +61,9 @@ public class MainController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/poll")
-    public ResponseEntity<Poll> getPoll(@RequestBody PollRequest request) {
-        Poll response = repository.findById(request.getPollId()).orElseThrow(NoSuchElementException::new);
+    @GetMapping(path = "/{pollId}")
+    public ResponseEntity<Poll> getPoll(@PathVariable String pollId) {
+        Poll response = repository.findById(pollId).orElseThrow(NoSuchElementException::new);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -82,5 +82,4 @@ public class MainController {
         repository.save(poll);
         return new ResponseEntity(HttpStatus.OK);
     }
-
 }
