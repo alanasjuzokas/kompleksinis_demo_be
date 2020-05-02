@@ -1,4 +1,4 @@
-package kompleksinis.demo.web.domain;
+package bakalauras.demo.web.domain;
 
 import javax.validation.constraints.NotNull;
 

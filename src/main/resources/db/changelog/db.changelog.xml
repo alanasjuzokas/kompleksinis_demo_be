@@ -1,0 +1,47 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Alanas" id="1">
+        <createTable tableName="users">
+            <column name="id" type="varchar(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="type" type="varchar(50)"/>
+            <column name="name" type="varchar(50)"/>
+            <column name="surname" type="varchar(255)"/>
+            <column name="phone" type="varchar(50)"/>
+            <column name="address" type="varchar(255)"/>
+            <column name="person_code" type="varchar(11)"/>
+            <column name="email" type="varchar(50)"/>
+        </createTable>
+        <createTable tableName="requests">
+            <column name="id" type="varchar(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="status" type="varchar(50)"/>
+            <column name="name" type="varchar(255)"/>
+            <column name="choices" type="text"/>
+            <column name="requester_id" type="varchar(255)">
+                <constraints nullable="false" foreignKeyName="fk_requests_requester_id" references="users(id)"/>
+            </column>
+        </createTable>
+        <createTable tableName="votings">
+            <column name="id" type="varchar(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="status" type="varchar(50)"/>
+            <column name="name" type="varchar(255)"/>
+            <column name="choices" type="text"/>
+            <column name="requester_id" type="varchar(255)">
+                <constraints nullable="false" foreignKeyName="fk_voting_requester_id" references="users(id)"/>
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO users(id, type, email, person_code) values (UUID(), 'ADMINISTRATOR', 'admin@admin.lt', '11111111111' )
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

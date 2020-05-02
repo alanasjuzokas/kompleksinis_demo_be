@@ -1,4 +1,4 @@
-package kompleksinis.demo.entities;
+package bakalauras.demo.entities;
 
 import org.hibernate.annotations.GenericGenerator;
 
