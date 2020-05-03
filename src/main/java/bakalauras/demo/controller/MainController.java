@@ -1,22 +1,21 @@
 package bakalauras.demo.controller;
 
 import bakalauras.demo.db.PollRepository;
-import bakalauras.demo.db.UserRepository;
 import bakalauras.demo.entities.Poll;
-import bakalauras.demo.entities.Users;
-import bakalauras.demo.web.domain.CreateRequest;
-import bakalauras.demo.web.domain.PollRequest;
-import bakalauras.demo.web.domain.VoteRequest;
+import bakalauras.demo.entities.domain.PollStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 
-@RestController
+@Controller
 @RequestMapping("/v1")
 public class MainController {
 
@@ -27,50 +26,27 @@ public class MainController {
         this.pollRepository = pollRepository;
     }
 
-    //TODO: move endpoints to related controllers,
-
-    @PostMapping(path = "/create")
-    public String createPoll(@RequestBody CreateRequest request) {
-        Poll poll = new Poll(request.question);
-        pollRepository.save(poll);
-        return poll.getId();
-    }
-
-    @PostMapping(path = "/vote")
-    public ResponseEntity vote(@RequestBody VoteRequest request) {
-        return new ResponseEntity(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    @GetMapping(path = "{pollId}/results")
+    @GetMapping(path = "polls/{pollId}/results")
     public ResponseEntity getVoteResults(@PathVariable String pollId) {
+        //TODO: results from blockchain implemented
         return new ResponseEntity(HttpStatus.NOT_IMPLEMENTED);
     }
 
     @GetMapping(path = "/polls")
     public ResponseEntity<List<Poll>> getPolls() {
         List<Poll> response = pollRepository.findAll();
-        return new ResponseEntity(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/{pollId}")
+    @GetMapping(path = "/polls/{pollId}")
     public ResponseEntity<Poll> getPoll(@PathVariable String pollId) {
         Poll response = pollRepository.findById(pollId).orElseThrow(NoSuchElementException::new);
-        return new ResponseEntity(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/active")
-    public ResponseEntity<List<Poll>> getActive() {
-        List<Poll> response = pollRepository.findAllByRunningTrue();
-        return new ResponseEntity(response, HttpStatus.OK);
+    @GetMapping(path = "/polls/status/{status}")
+    public ResponseEntity<List<Poll>> getPollsByStatus(@PathVariable PollStatus status) {
+        return new ResponseEntity<>(pollRepository.findAllByStatus(status), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/stop")
-    public ResponseEntity stopPoll(@RequestBody PollRequest request) {
-        Poll poll = pollRepository.findById(request.getPollId()).orElseThrow(NoSuchElementException::new);
-        if (poll.isRunning()) {
-            poll.setRunning(false);
-        }
-        pollRepository.save(poll);
-        return new ResponseEntity(HttpStatus.OK);
-    }
 }

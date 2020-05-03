@@ -1,6 +1,6 @@
 package bakalauras.demo.entities.domain;
 
-public enum VotingStatus {
+public enum PollStatus {
 
     NOT_STARTED, STARTED, STOPPED
 

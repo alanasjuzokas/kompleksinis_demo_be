@@ -1,20 +1,32 @@
 package bakalauras.demo.entities;
 
 import bakalauras.demo.config.StringListConverter;
-import bakalauras.demo.entities.domain.PollStatus;
+import bakalauras.demo.entities.domain.RequestStatus;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.List;
 
 @Entity
-@Table(name = "polls")
-public class Poll {
+@Table(name = "requests")
+public class Request {
+
+    public Request() {
+    }
+
+    public Request(RequestStatus status, String name, List<String> choices, String requesterId) {
+        this.status = status;
+        this.name = name;
+        this.choices = choices;
+        this.requesterId = requesterId;
+    }
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -22,7 +34,8 @@ public class Poll {
     String id;
 
     @Column
-    PollStatus status;
+    @Enumerated(EnumType.STRING)
+    RequestStatus status;
 
     @Column
     String name;
@@ -34,20 +47,19 @@ public class Poll {
     @Column
     String requesterId;
 
-    public Poll() {}
-
-    public Poll(Request request) {
-        this.status = PollStatus.NOT_STARTED;
-        this.name = request.getName();
-        this.choices = request.getChoices();
-        this.requesterId = request.getRequesterId();
+    public String getId() {
+        return id;
     }
 
-    public PollStatus getStatus() {
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public RequestStatus getStatus() {
         return status;
     }
 
-    public void setStatus(PollStatus status) {
+    public void setStatus(RequestStatus status) {
         this.status = status;
     }
 

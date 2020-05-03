@@ -28,7 +28,7 @@
                 <constraints nullable="false" foreignKeyName="fk_requests_requester_id" references="users(id)"/>
             </column>
         </createTable>
-        <createTable tableName="votings">
+        <createTable tableName="polls">
             <column name="id" type="varchar(255)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -36,7 +36,7 @@
             <column name="name" type="varchar(255)"/>
             <column name="choices" type="text"/>
             <column name="requester_id" type="varchar(255)">
-                <constraints nullable="false" foreignKeyName="fk_voting_requester_id" references="users(id)"/>
+                <constraints nullable="false" foreignKeyName="fk_poll_requester_id" references="users(id)"/>
             </column>
         </createTable>
         <sql>
