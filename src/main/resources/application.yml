@@ -12,3 +12,5 @@ spring:
     console:
       enabled: true
       path: /vote_database
+      settings:
+        web-allow-others: true
