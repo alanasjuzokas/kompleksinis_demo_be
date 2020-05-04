@@ -43,6 +43,10 @@ public class Poll {
         this.requesterId = request.getRequesterId();
     }
 
+    public String getId() {
+        return id;
+    }
+
     public PollStatus getStatus() {
         return status;
     }

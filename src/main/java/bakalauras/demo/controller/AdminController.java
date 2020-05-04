@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/v1")
@@ -37,40 +38,52 @@ public class AdminController {
     //TODO: add endpoint for approving, getting, declining requests. Starting and stopping polls
     @PostMapping(path = "/polls/stop")
     public ResponseEntity stopPoll(@RequestBody PollRequest request) {
-        Poll poll = pollRepository.findById(request.getPollId()).orElseThrow(NoSuchElementException::new);
-        if (poll.getStatus() == PollStatus.STARTED) {
-            poll.setStatus(PollStatus.STOPPED);
+        Optional<Poll> poll = pollRepository.findById(request.getPollId());
+        if (poll.isPresent()) {
+            if (poll.get().getStatus() == PollStatus.STARTED) {
+                poll.get().setStatus(PollStatus.STOPPED);
+            }
+            pollRepository.save(poll.get());
+            return new ResponseEntity(HttpStatus.OK);
         }
-        pollRepository.save(poll);
-        return new ResponseEntity(HttpStatus.OK);
+       return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping(path = "/polls/start")
     public ResponseEntity startPoll(@RequestBody PollRequest request) {
-        Poll poll = pollRepository.findById(request.getPollId()).orElseThrow(NoSuchElementException::new);
-        if (poll.getStatus() == PollStatus.NOT_STARTED) {
-            poll.setStatus(PollStatus.STARTED);
+        Optional<Poll> poll = pollRepository.findById(request.getPollId());
+        if (poll.isPresent()){
+            if (poll.get().getStatus() == PollStatus.NOT_STARTED) {
+                poll.get().setStatus(PollStatus.STARTED);
+            }
+            pollRepository.save(poll.get());
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        pollRepository.save(poll);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping(path = "/requests/approve")
     public ResponseEntity<Poll> approveRequest(@RequestBody RequestActionRequest actionRequest) {
-        Request request = requestRepository.findById(actionRequest.getRequestId()).orElseThrow(NoSuchElementException::new);
-        request.setStatus(RequestStatus.APPROVED);
-        requestRepository.save(request);
-        Poll poll = new Poll(request);
-        pollRepository.save(poll);
-        return new ResponseEntity<>(poll, HttpStatus.OK);
+        Optional<Request> request = requestRepository.findById(actionRequest.getRequestId());
+        if (request.isPresent()) {
+            request.get().setStatus(RequestStatus.APPROVED);
+            requestRepository.save(request.get());
+            Poll poll = new Poll(request.get());
+            pollRepository.save(poll);
+            return new ResponseEntity<>(poll, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping(path = "/requests/reject")
-    public ResponseEntity rejectPoll(@RequestBody RequestActionRequest actionRequest) {
-        Request request = requestRepository.findById(actionRequest.getRequestId()).orElseThrow(NoSuchElementException::new);
-        request.setStatus(RequestStatus.REJECTED);
-        requestRepository.save(request);
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<Request> rejectPoll(@RequestBody RequestActionRequest actionRequest) {
+        Optional<Request> request = requestRepository.findById(actionRequest.getRequestId());
+        if (request.isPresent()) {
+            request.get().setStatus(RequestStatus.REJECTED);
+            requestRepository.save(request.get());
+            return new ResponseEntity<>(request.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping(path = "/requests")

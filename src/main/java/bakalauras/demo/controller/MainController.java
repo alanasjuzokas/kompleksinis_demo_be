@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 
 @Controller
@@ -40,8 +40,11 @@ public class MainController {
 
     @GetMapping(path = "/polls/{pollId}")
     public ResponseEntity<Poll> getPoll(@PathVariable String pollId) {
-        Poll response = pollRepository.findById(pollId).orElseThrow(NoSuchElementException::new);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        Optional<Poll> response = pollRepository.findById(pollId);
+        if (response.isPresent()) {
+            return new ResponseEntity<>(response.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping(path = "/polls/status/{status}")

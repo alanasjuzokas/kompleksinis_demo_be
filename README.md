@@ -1,123 +1,392 @@
 # API
 
-### Create new poll
+### Stop poll
 
 ```
-POST https://fierce-waters-74037.herokuapp.com/v1/create
+POST https://vote-block-demo.herokuapp.com/v1/polls/stop
 
 Payload: 
 
 {
-    "question": "Wanna vote?
+    "pollId": "123"
 }
 
 Response:
 
-e532ab6f-0357-45ec-8ef5-a8854588a7ad
+200, 404
+```
+### Start poll
 
 ```
-### Vote
-
-```
-POST https://fierce-waters-74037.herokuapp.com/v1/vote
+POST https://vote-block-demo.herokuapp.com/v1/polls/start
 
 Payload: 
 
 {
-    "pollId": "e532ab6f-0357-45ec-8ef5-a8854588a7ad",
-    "votedYes": true
+    "pollId": "123"
 }
 
 Response:
-200, 400
+
+200, 404
 ```
 
-### Get poll results
+### Approve request
 
 ```
-GET https://fierce-waters-74037.herokuapp.com/v1/{pollId}/results
+POST https://vote-block-demo.herokuapp.com/v1/requests/approve
 
-Response:
+Payload: 
+
 {
-    "yes": 1,
-    "no": 0
+    "requestId": "123"
 }
+
+Response (Poll):
+{
+        "id": "1dd8a1fa-0c5f-486d-8e4d-59b38830c72b",
+        "status": "NOT_STARTED",
+        "name": "Test requets",
+        "choices": [
+            "pirmas choice",
+            "antras choice"
+        ],
+        "requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
+    }
+
+200, 404
+```
+
+### Reject request
+
+```
+POST https://vote-block-demo.herokuapp.com/v1/requests/reject
+
+Payload: 
+
+{
+    "requestId": "123"
+}
+
+Response (Request):
+{
+    "id": "123",
+    "status": "REJECTED",
+    "name": "Test requets2",
+    "choices": [
+        "pirmas choice",
+        "antras choice"
+    ],
+    "requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
+}
+
+200, 404
+```
+
+### Get all requests
+
+```
+GET https://vote-block-demo.herokuapp.com/v1/requests
+
+Response:
+[
+    {
+        "id": "e8bbeca8-1c8e-4137-ad89-0fcded559611",
+        "status": "APPROVED",
+        "name": "Test requets",
+        "choices": [
+            "pirmas choice",
+            "antras choice"
+        ],
+        "requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
+    },
+    {
+        "id": "22743918-9fe4-4aca-aca3-564a710eca6f",
+        "status": "REJECTED",
+        "name": "Test requets2",
+        "choices": [
+            "pirmas choice",
+            "antras choice"
+        ],
+        "requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
+    }
+]
+
+200
+```
+
+### Get requests by status [APPROVED, PENDING, REJECTED]
+
+```
+GET https://fierce-waters-74037.herokuapp.com/v1/request/{status}
+
+Response:
+[
+    {
+        "id": "22743918-9fe4-4aca-aca3-564a710eca6f",
+        "status": "REJECTED",
+        "name": "Test requets2",
+        "choices": [
+            "pirmas choice",
+            "antras choice"
+        ],
+        "requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
+    }
+] 200
+```
+
+### Get vote results
+
+```
+GET https://vote-block-demo.herokuapp.com/v1/polls/{pollId}/results
+
+Response:
+NOT IMPLEMENTED
 ```
 
 ### Get all polls
 
 ```
-GET https://fierce-waters-74037.herokuapp.com/v1/polls
+GET https://vote-block-demo.herokuapp.com/v1/polls
 
 Response:
 [
     {
-        "id": "1111111111111",
-        "question": "simple quest",
-        "yes": 1,
-        "no": 0,
-        "running": true
-    },
-    {
-       "id": "22222222",
-       "question": "another simple quest",
-       "yes": 1,
-       "no": 2,
-       "running": false
-    },
+            "id": "1dd8a1fa-0c5f-486d-8e4d-59b38830c72b",
+            "status": "NOT_STARTED",
+            "name": "Test requets",
+            "choices": [
+                "pirmas choice",
+                "antras choice"
+            ],
+            "requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
+        }
 ]
+
+200
 ```
 
-### Get poll 
+### Get poll by id
 
 ```
-GET https://fierce-waters-74037.herokuapp.com/v1/{pollId}
+GET https://vote-block-demo.herokuapp.com/v1/polls/{pollId}
 
 Response:
 {
-        "id": "1111111111111",
-        "question": "simple quest",
-        "yes": 1,
-        "no": 0,
-        "running": true
+    "id": "1dd8a1fa-0c5f-486d-8e4d-59b38830c72b",
+    "status": "NOT_STARTED",
+    "name": "Test requets",
+    "choices": [
+        "pirmas choice",
+        "antras choice"
+    ],
+    "requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
 }
+
+200, 404
 ```
 
-### Get active polls
+### Get polls by status [NOT_STARTED, STARTED, STOPPED]
 
 ```
-GET https://fierce-waters-74037.herokuapp.com/v1/active
+GET https://vote-block-demo.herokuapp.com/v1/polls/status/{status}
 
 Response:
 [
     {
-        "id": "1111111111111",
-        "question": "simple quest",
-        "yes": 1,
-        "no": 0,
-        "running": true
-    },
-    {
-       "id": "22222222",
-       "question": "another simple quest",
-       "yes": 1,
-       "no": 2,
-       "running": true
-    },
+        "id": "1dd8a1fa-0c5f-486d-8e4d-59b38830c72b",
+        "status": "NOT_STARTED",
+        "name": "Test requets",
+        "choices": [
+            "pirmas choice",
+            "antras choice"
+        ],
+        "requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
+    }
 ]
+200
 ```
 
-### Stop poll
+### Approve request
 
 ```
-POST https://fierce-waters-74037.herokuapp.com/v1/stop
+POST https://vote-block-demo.herokuapp.com/v1/requests/approve
 
 Payload: 
 
 {
-    "pollId": "e532ab6f-0357-45ec-8ef5-a8854588a7ad",
+    "requestId": "123"
 }
 
 Response:
+{
+ "status": "NOT_STARTED",
+    "name": "Test requets",
+    "choices": [
+        "pirmas choice",
+        "antras choice"
+    ],
+    "requesterId": "123"
+}
+
+200, 404
+```
+
+### Create poll request (kol auth nera reikia id perduot)
+
+```
+POST https://vote-block-demo.herokuapp.com/v1/requests/create
+
+Payload: 
+
+    {
+    	"name": "Test requets2",
+    	"choices": [
+    		"pirmas choice", "antras choice"
+    	],
+    	"requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
+    }
+
+
+Response:
+{
+    "id": "22743918-9fe4-4aca-aca3-564a710eca6f",
+    "status": "PENDING",
+    "name": "Test requets2",
+    "choices": [
+        "pirmas choice",
+        "antras choice"
+    ],
+    "requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
+}
+
 200
+```
+
+### Create requester user
+
+```
+POST https://vote-block-demo.herokuapp.com/v1/users/requester
+
+Payload: 
+
+{
+	"name": "test",
+	"surname": "user",
+	"phone": "111113",
+	"address": "testo gatve",
+	"personCode": "1233",
+	"email": "aiko@lo.lt"
+}
+
+Response:
+{
+    "id": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7",
+    "type": "REQUESTER",
+    "name": "test",
+    "surname": "user",
+    "phone": "111113",
+    "address": "testo gatve",
+    "personCode": "1233",
+    "email": "aiko@lo.lt"
+}
+
+200
+```
+
+### Get user by personcode
+
+```
+GET https://vote-block-demo.herokuapp.com/v1/users/{personCode}
+
+Response:
+{
+    "id": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7",
+    "type": "REQUESTER",
+    "name": "test",
+    "surname": "user",
+    "phone": "111113",
+    "address": "testo gatve",
+    "personCode": "1233",
+    "email": "aiko@lo.lt"
+}
+
+or
+
+{
+    "id": "b0d78693-b8e6-4894-b81d-db17586f96f1",
+    "type": "ADMINISTRATOR",
+    "name": null,
+    "surname": null,
+    "phone": null,
+    "address": null,
+    "personCode": "11111111111",
+    "email": "admin@admin.lt"
+}
+
+200, 404
+```
+
+### Get requester requests
+
+```
+GET https://vote-block-demo.herokuapp.com/v1/users/{requesterId}/requests
+
+Response:
+[
+    {
+        "id": "e8bbeca8-1c8e-4137-ad89-0fcded559611",
+        "status": "APPROVED",
+        "name": "Test requets",
+        "choices": [
+            "pirmas choice",
+            "antras choice"
+        ],
+        "requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
+    },
+    {
+        "id": "22743918-9fe4-4aca-aca3-564a710eca6f",
+        "status": "REJECTED",
+        "name": "Test requets2",
+        "choices": [
+            "pirmas choice",
+            "antras choice"
+        ],
+        "requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
+    }
+]
+
+200
+```
+
+### Get requester polls
+
+```
+GET https://vote-block-demo.herokuapp.com/v1/users/{requesterId}/polls
+
+Response:
+[
+    {
+        "id": "1dd8a1fa-0c5f-486d-8e4d-59b38830c72b",
+        "status": "NOT_STARTED",
+        "name": "Test requets",
+        "choices": [
+            "pirmas choice",
+            "antras choice"
+        ],
+        "requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
+    }
+]
+
+200, 302
+```
+
+### Vote
+
+```
+POST https://vote-block-demo.herokuapp.com/v1/polls/vote
+
+Response:
+NOT_IMPLEMENTED
+
 ```
