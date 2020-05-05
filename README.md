@@ -390,3 +390,37 @@ Response:
 NOT_IMPLEMENTED
 
 ```
+### Init smart id login
+
+```
+POST https://vote-block-demo.herokuapp.com/v1/login
+
+Payload: 
+
+{
+    "idCode": "3970900000"
+}
+
+Response:
+{
+    "sessionId": "123",
+    "verificationCode": "1242"
+}
+
+200
+```
+
+### Init smart id poll
+
+```
+GET https://vote-block-demo.herokuapp.com/v1/login/{sessionId}
+STATUS can be [RUNNING, COMPLETE]
+
+Response:
+{
+    "state": "RUNNING",
+    "authToken": ""
+}
+
+200
+```
