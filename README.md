@@ -419,7 +419,12 @@ STATUS can be [RUNNING, COMPLETE]
 Response:
 {
     "state": "RUNNING",
-    "authToken": ""
+    "authToken": "",
+    "subject": {
+            "givenName": "DEMO",
+            "serialNumber": "10101010005",
+            "surname": "SMART-ID"
+       }
 }
 
 200

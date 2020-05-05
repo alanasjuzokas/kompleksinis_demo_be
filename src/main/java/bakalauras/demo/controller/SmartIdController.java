@@ -54,7 +54,7 @@ public class SmartIdController {
       AuthenticationResponse authenticationResponse = restTemplate.getForObject(url, AuthenticationResponse.class);
       Subject subject = getSignPerson(authenticationResponse);
 
-      return new LoginResponse(authenticationResponse.getState(), "");
+      return new LoginResponse(authenticationResponse.getState(), "", subject);
    }
 
    private Subject getSignPerson(AuthenticationResponse authenticationResponse) throws CertificateException {
