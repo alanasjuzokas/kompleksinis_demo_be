@@ -26,47 +26,59 @@ import java.util.Base64;
 @RequestMapping("/v1")
 public class SmartIdController {
 
-   @PostMapping(path = "/login")
-   SmartIdLoginResponse initSmartId(@RequestBody LoginInitRequest request) {
+    @PostMapping(path = "/login")
+    SmartIdLoginResponse initSmartId(@RequestBody LoginInitRequest request) {
 
-      AuthenticationHash authenticationHash = AuthenticationHash.generateRandomHash();
+        AuthenticationHash authenticationHash = AuthenticationHash.generateRandomHash();
 
-      String verificationCode = authenticationHash.calculateVerificationCode();
+        String verificationCode = authenticationHash.calculateVerificationCode();
 
-      RestTemplate restTemplate = new RestTemplate();
-      String url = "https://sid.demo.sk.ee/smart-id-rp/v1/authentication/etsi/PNOLT-" + request.getIdCode();
-      SmartIdInitReq req = new SmartIdInitReq(
-              "00000000-0000-0000-0000-000000000000",
-              "DEMO",
-              authenticationHash.getHashInBase64(),
-              "SHA512"
-      );
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://sid.demo.sk.ee/smart-id-rp/v1/authentication/etsi/PNOLT-" + request.getIdCode();
+        SmartIdInitReq req = new SmartIdInitReq(
+                "00000000-0000-0000-0000-000000000000",
+                "DEMO",
+                authenticationHash.getHashInBase64(),
+                "SHA512"
+        );
 
-      SessionResponse sessionId = restTemplate.postForObject(url, req, SessionResponse.class);
+        SessionResponse sessionId = restTemplate.postForObject(url, req, SessionResponse.class);
 
-      return new SmartIdLoginResponse(sessionId.getSessionID(), verificationCode);
-   }
+        return new SmartIdLoginResponse(sessionId.getSessionID(), verificationCode);
+    }
 
-   @GetMapping(path = "/login/{sessionId}")
-   LoginResponse smartIdLogin(@PathVariable String sessionId) throws CertificateException {
-      RestTemplate restTemplate = new RestTemplate();
-      String url = "https://sid.demo.sk.ee/smart-id-rp/v1/session/" + sessionId;
-      AuthenticationResponse authenticationResponse = restTemplate.getForObject(url, AuthenticationResponse.class);
-      Subject subject = getSignPerson(authenticationResponse);
+    @GetMapping(path = "/login/{sessionId}")
+    LoginResponse smartIdLogin(@PathVariable String sessionId) throws CertificateException {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://sid.demo.sk.ee/smart-id-rp/v1/session/" + sessionId;
+        AuthenticationResponse authenticationResponse = restTemplate.getForObject(url, AuthenticationResponse.class);
+        Subject subject = getSignPerson(authenticationResponse);
 
-      return new LoginResponse(authenticationResponse.getState(), "", subject);
-   }
+        return new LoginResponse(authenticationResponse.getState(), "", subject);
+    }
 
-   private Subject getSignPerson(AuthenticationResponse authenticationResponse) throws CertificateException {
-      byte encodedCert[] = Base64.getDecoder().decode(authenticationResponse.getCert().getValue());
-      ByteArrayInputStream inputStream = new ByteArrayInputStream(encodedCert);
-      CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-      X509Certificate cert = (X509Certificate) certificateFactory.generateCertificate(inputStream);
-      String[] subject = cert.getSubjectDN().getName().split(",");
-      return new Subject(
-              subject[5].split("=")[1],
-              subject[3].split("-")[1],
-              subject[6].split("=")[1]);
-   }
+    private Subject getSignPerson(AuthenticationResponse authenticationResponse) throws CertificateException {
+        byte encodedCert[] = Base64.getDecoder().decode(authenticationResponse.getCert().getValue());
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(encodedCert);
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        X509Certificate cert = (X509Certificate) certificateFactory.generateCertificate(inputStream);
+        String[] subject = cert.getSubjectDN().getName().split(",");
+        String name = "";
+        String surname = "";
+        String personCode = "";
+        for (String word : subject) {
+            System.out.println(word);
+            if (word.contains("GIVENNAME")) {
+                name = word.split("=")[1];
+            }
+            if (word.contains("SERIALNUMBER")) {
+                personCode = word.split("=")[1].split("-")[1];
+            }
+            if (word.contains("SURNAME")) {
+                surname = word.split("=")[1];
+            }
+        }
+        return new Subject( name, personCode, surname);
+    }
 
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -38,9 +39,9 @@ public class UserController {
         this.pollRepository = pollRepository;
     }
 
-    //TODO: add endpoint for requesting a poll, getting a list of your requests, get poll results endpoint from blockchain
     @PostMapping(path = "requests/create")
-    public ResponseEntity<Request> createRequest(@RequestBody CreateRequest createRequest) {
+    public ResponseEntity<Request> createRequest(@RequestBody CreateRequest createRequest,
+                                                 @RequestHeader (name = "Authorization") String token) {
         Request request = new Request(
                 RequestStatus.PENDING,
                 createRequest.name,
