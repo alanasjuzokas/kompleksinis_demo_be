@@ -32,10 +32,4 @@ public class SmartIdInitReq {
         return hashType;
     }
 
-//    public SmartIdInitReq(String relyingPartyUUID, String relyingPartyName, String hash, String hashType) {
-//        this.relyingPartyUUID = relyingPartyUUID;
-//        this.relyingPartyName = relyingPartyName;
-//        this.hash = hash;
-//        this.hashType = hashType;
-//    }
 }

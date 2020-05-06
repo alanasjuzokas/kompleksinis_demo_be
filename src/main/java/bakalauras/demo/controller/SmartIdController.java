@@ -1,5 +1,6 @@
 package bakalauras.demo.controller;
 
+import bakalauras.demo.config.JwtConfig;
 import bakalauras.demo.web.domain.AuthenticationResponse;
 import bakalauras.demo.web.domain.LoginInitRequest;
 import bakalauras.demo.web.domain.LoginResponse;
@@ -8,6 +9,11 @@ import bakalauras.demo.web.domain.SmartIdInitReq;
 import bakalauras.demo.web.domain.SmartIdLoginResponse;
 import bakalauras.demo.web.domain.Subject;
 import ee.sk.smartid.AuthenticationHash;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.Encoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,11 +22,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
+import java.security.Key;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
+import java.util.Date;
+
+import static bakalauras.demo.config.JwtConfig.SIGN_KEY;
 
 @RestController
 @RequestMapping("/v1")
@@ -54,7 +65,19 @@ public class SmartIdController {
         AuthenticationResponse authenticationResponse = restTemplate.getForObject(url, AuthenticationResponse.class);
         Subject subject = getSignPerson(authenticationResponse);
 
-        return new LoginResponse(authenticationResponse.getState(), "", subject);
+        Date today = new Date();
+        Date tomorrow = new Date(today.getTime() + (1000 * 60 * 60 * 24));
+
+        SecretKey keys = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SIGN_KEY));
+        String token = Jwts
+                .builder()
+                .setSubject("Demo JWT")
+                .setExpiration(tomorrow)
+                .claim("test", "ok")
+                .signWith(keys)
+                .compact();
+
+        return new LoginResponse(authenticationResponse.getState(), token, subject);
     }
 
     private Subject getSignPerson(AuthenticationResponse authenticationResponse) throws CertificateException {
