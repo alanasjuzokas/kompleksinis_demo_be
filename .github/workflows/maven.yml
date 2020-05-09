@@ -23,12 +23,3 @@ jobs:
         java-version: 1.8
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-    - name: Scope for Maven
-      uses: undefinedlabs/scope-for-maven-action@v1
-      with:
-        # Scope DSN
-        dsn: true
-        # Flag to indicate if tests must be run. default: true
-        run-tests: true # default is true
-        # Command to run your tests. default: mvn verify
-        command: mvn test # default is mvn verify
