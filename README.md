@@ -271,7 +271,7 @@ POST https://vote-block-demo.herokuapp.com/v1/users/requester
 Payload: 
 
 {
-	"name": "test",
+	"name": "tempo",
 	"surname": "user",
 	"phone": "111113",
 	"address": "testo gatve",
@@ -283,7 +283,7 @@ Response:
 {
     "id": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7",
     "type": "REQUESTER",
-    "name": "test",
+    "name": "tempo",
     "surname": "user",
     "phone": "111113",
     "address": "testo gatve",
@@ -303,7 +303,7 @@ Response:
 {
     "id": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7",
     "type": "REQUESTER",
-    "name": "test",
+    "name": "tempo",
     "surname": "user",
     "phone": "111113",
     "address": "testo gatve",
