@@ -50,18 +50,12 @@ public class UserController {
     @PostMapping(path = "requests/create")
     public ResponseEntity<Request> createRequest(@RequestBody CreateRequest createRequest,
                                                  @RequestHeader (name = "Authorization") String token) {
-
-        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SIGN_KEY));
-
-        String personCode = Jwts.parserBuilder().setSigningKey(key).build()
-                .parseClaimsJws(token).getBody().get("personCode", String.class);
-
         Request request = new Request(
                 RequestStatus.PENDING,
                 createRequest.name,
                 createRequest.choices,
-                personCode
-                );
+                createRequest.requesterId
+        );
 
         requestRepository.save(request);
         return new ResponseEntity<>(request, HttpStatus.OK);

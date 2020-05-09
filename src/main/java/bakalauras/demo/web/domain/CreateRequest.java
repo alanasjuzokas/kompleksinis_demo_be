@@ -11,6 +11,9 @@ public class CreateRequest {
     @NotNull
     public List<String> choices;
 
+    @NotBlank
+    public String requesterId;
+
     public String getName() {
         return name;
     }
@@ -19,4 +22,7 @@ public class CreateRequest {
         return choices;
     }
 
+    public String getRequesterId() {
+        return requesterId;
+    }
 }
