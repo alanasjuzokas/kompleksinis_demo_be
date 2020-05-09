@@ -1,6 +1,5 @@
 package bakalauras.demo.controller;
 
-import bakalauras.demo.config.JwtConfig;
 import bakalauras.demo.web.domain.AuthenticationResponse;
 import bakalauras.demo.web.domain.LoginInitRequest;
 import bakalauras.demo.web.domain.LoginResponse;
@@ -10,9 +9,7 @@ import bakalauras.demo.web.domain.SmartIdLoginResponse;
 import bakalauras.demo.web.domain.Subject;
 import ee.sk.smartid.AuthenticationHash;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +21,9 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
-import java.security.Key;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -42,6 +41,7 @@ public class SmartIdController {
 
         AuthenticationHash authenticationHash = AuthenticationHash.generateRandomHash();
 
+        //Instead of manual hash calculating, SmartID calculation is given in JAR
         String verificationCode = authenticationHash.calculateVerificationCode();
 
         RestTemplate restTemplate = new RestTemplate();
@@ -102,6 +102,22 @@ public class SmartIdController {
             }
         }
         return new Subject( name, personCode, surname);
+    }
+
+    private byte[] calculateHash() throws NoSuchAlgorithmException {
+        SecureRandom random = new SecureRandom();
+
+        byte randBytes[] = new byte[64];
+
+        random.nextBytes(randBytes);
+
+        MessageDigest md = MessageDigest.getInstance("SHA-512");
+
+        md.update(randBytes);
+
+        byte[] hash = md.digest();
+
+        return org.apache.tomcat.util.codec.binary.Base64.encodeBase64(hash);
     }
 
 }
