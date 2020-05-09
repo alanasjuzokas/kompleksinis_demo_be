@@ -1,3 +1,5 @@
+![Java CI with Maven](https://github.com/alanasjuzokas/kompleksinis_demo_be/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
+
 # API
 
 ### Stop poll
