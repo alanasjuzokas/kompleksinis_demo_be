@@ -73,7 +73,7 @@ public class SmartIdController {
                 .builder()
                 .setSubject("Demo JWT")
                 .setExpiration(tomorrow)
-                .claim("test", "ok")
+                .claim("personCode", subject.getSerialNumber())
                 .signWith(keys)
                 .compact();
 
