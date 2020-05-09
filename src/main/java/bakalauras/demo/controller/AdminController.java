@@ -34,7 +34,6 @@ public class AdminController {
         this.pollRepository = pollRepository;
     }
 
-    //TODO: add endpoint for approving, getting, declining requests. Starting and stopping polls
     @PostMapping(path = "/polls/stop")
     public ResponseEntity stopPoll(@RequestBody PollRequest request) {
         Optional<Poll> poll = pollRepository.findById(request.getPollId());

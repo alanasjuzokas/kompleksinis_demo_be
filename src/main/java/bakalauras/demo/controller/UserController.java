@@ -7,14 +7,8 @@ import bakalauras.demo.entities.Poll;
 import bakalauras.demo.entities.Request;
 import bakalauras.demo.entities.Users;
 import bakalauras.demo.entities.domain.CreateRequester;
-import bakalauras.demo.entities.domain.JwtParseResponse;
 import bakalauras.demo.entities.domain.RequestStatus;
 import bakalauras.demo.web.domain.CreateRequest;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.Encoders;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.crypto.SecretKey;
-import static bakalauras.demo.config.JwtConfig.SIGN_KEY;
 import java.util.List;
 
 @RequestMapping("/v1")
@@ -48,8 +39,7 @@ public class UserController {
     }
 
     @PostMapping(path = "requests/create")
-    public ResponseEntity<Request> createRequest(@RequestBody CreateRequest createRequest,
-                                                 @RequestHeader (name = "Authorization") String token) {
+    public ResponseEntity<Request> createRequest(@RequestBody CreateRequest createRequest) {
         Request request = new Request(
                 RequestStatus.PENDING,
                 createRequest.name,
