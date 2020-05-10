@@ -1,5 +1,6 @@
 package bakalauras.demo.controller;
 
+import bakalauras.demo.config.JwtConfig;
 import bakalauras.demo.db.PollRepository;
 import bakalauras.demo.db.RequestRepository;
 import bakalauras.demo.db.UserRepository;
@@ -51,6 +52,10 @@ public class UserController {
     public ResponseEntity<Request> createRequest(@RequestBody CreateRequest createRequest,
                                                  @RequestHeader(name = "Authorization") String token) {
 
+        if (!JwtConfig.isRequester(token)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SIGN_KEY));
 
         String personCode = Jwts.parserBuilder().setSigningKey(key).build()
@@ -60,8 +65,6 @@ public class UserController {
                 .parseClaimsJws(token).getBody().get("role", String.class);
 
         String requesterId = "";
-
-
 
         if (role.equals(Type.REQUESTER.toString())) {
             Optional<Users> user = userRepository.findByPersonCode(personCode);
@@ -92,7 +95,12 @@ public class UserController {
     }
 
     @GetMapping(path = "users/{personCode}")
-    public ResponseEntity<Users> getUserByPersonCode(@PathVariable String personCode) {
+    public ResponseEntity<Users> getUserByPersonCode(@PathVariable String personCode,
+                                                     @RequestHeader(name = "Authorization") String token) {
+        if (!JwtConfig.isAdministrator(token)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         Optional<Users> users = userRepository.findByPersonCode(personCode);
         if (users.isPresent()) {
             return new ResponseEntity<>(users.get(), HttpStatus.FOUND);
@@ -101,12 +109,24 @@ public class UserController {
     }
 
     @GetMapping(path = "users/{requesterId}/requests")
-    public ResponseEntity<List<Request>> getRequesterRequests(@PathVariable String requesterId) {
+    public ResponseEntity<List<Request>> getRequesterRequests(@PathVariable String requesterId,
+                                                              @RequestHeader(name = "Authorization") String token) {
+
+        if (!JwtConfig.isAdministrator(token) && !JwtConfig.isRequester(token)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         return new ResponseEntity<>(requestRepository.findAllByRequesterId(requesterId), HttpStatus.FOUND);
     }
 
     @GetMapping(path = "users/{requesterId}/polls")
-    public ResponseEntity<List<Poll>> getRequesterPolls(@PathVariable String requesterId) {
+    public ResponseEntity<List<Poll>> getRequesterPolls(@PathVariable String requesterId,
+                                                        @RequestHeader(name = "Authorization") String token) {
+
+        if (!JwtConfig.isAdministrator(token) && !JwtConfig.isRequester(token)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         return new ResponseEntity<>(pollRepository.findAllByRequesterId(requesterId), HttpStatus.FOUND);
     }
 

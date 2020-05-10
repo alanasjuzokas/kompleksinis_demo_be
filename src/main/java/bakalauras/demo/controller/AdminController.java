@@ -1,5 +1,6 @@
 package bakalauras.demo.controller;
 
+import bakalauras.demo.config.JwtConfig;
 import bakalauras.demo.db.PollRepository;
 import bakalauras.demo.db.RequestRepository;
 import bakalauras.demo.entities.Poll;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestTemplate;
 
@@ -39,7 +41,12 @@ public class AdminController {
     }
 
     @PostMapping(path = "/polls/stop")
-    public ResponseEntity stopPoll(@RequestBody PollRequest request) {
+    public ResponseEntity stopPoll(@RequestBody PollRequest request, @RequestHeader(name = "Authorization") String token) {
+
+        if (!JwtConfig.isAdministrator(token)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         Optional<Poll> poll = pollRepository.findById(request.getPollId());
         if (poll.isPresent()) {
             if (poll.get().getStatus() == PollStatus.STARTED) {
@@ -52,7 +59,12 @@ public class AdminController {
     }
 
     @PostMapping(path = "/polls/start")
-    public ResponseEntity startPoll(@RequestBody PollRequest request) {
+    public ResponseEntity startPoll(@RequestBody PollRequest request, @RequestHeader(name = "Authorization") String token) {
+
+        if (!JwtConfig.isAdministrator(token)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         Optional<Poll> poll = pollRepository.findById(request.getPollId());
         if (poll.isPresent()){
             if (poll.get().getStatus() == PollStatus.NOT_STARTED) {
@@ -65,7 +77,13 @@ public class AdminController {
     }
 
     @PostMapping(path = "/requests/approve")
-    public ResponseEntity<Poll> approveRequest(@RequestBody RequestActionRequest actionRequest) {
+    public ResponseEntity<Poll> approveRequest(@RequestBody RequestActionRequest actionRequest,
+                                               @RequestHeader(name = "Authorization") String token) {
+
+        if (!JwtConfig.isAdministrator(token)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         Optional<Request> request = requestRepository.findById(actionRequest.getRequestId());
         if (request.isPresent()) {
             request.get().setStatus(RequestStatus.APPROVED);
@@ -99,7 +117,13 @@ public class AdminController {
     }
 
     @PostMapping(path = "/requests/reject")
-    public ResponseEntity<Request> rejectPoll(@RequestBody RequestActionRequest actionRequest) {
+    public ResponseEntity<Request> rejectPoll(@RequestBody RequestActionRequest actionRequest,
+                                              @RequestHeader(name = "Authorization") String token) {
+
+        if (!JwtConfig.isAdministrator(token)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         Optional<Request> request = requestRepository.findById(actionRequest.getRequestId());
         if (request.isPresent()) {
             request.get().setStatus(RequestStatus.REJECTED);
@@ -110,17 +134,32 @@ public class AdminController {
     }
 
     @GetMapping(path = "/requests")
-    public ResponseEntity<List<Request>> getAllRequests() {
+    public ResponseEntity<List<Request>> getAllRequests(@RequestHeader(name = "Authorization") String token) {
+
+        if (!JwtConfig.isAdministrator(token)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         return new ResponseEntity(requestRepository.findAll() ,HttpStatus.OK);
     }
 
     @GetMapping(path = "/requests/{status}")
-    public ResponseEntity<List<Request>> getRequestsByStatus(@PathVariable RequestStatus status) {
+    public ResponseEntity<List<Request>> getRequestsByStatus(@PathVariable RequestStatus status,
+                                                             @RequestHeader(name = "Authorization") String token) {
+        if (!JwtConfig.isAdministrator(token)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         return new ResponseEntity<>(requestRepository.findAllByStatus(status) , HttpStatus.OK);
     }
 
     @PostMapping(path = "/chain/user/{pollId}")
-    public ResponseEntity checkIfUserBlockChainIsValid(@PathVariable String pollId) {
+    public ResponseEntity checkIfUserBlockChainIsValid(@PathVariable String pollId,
+                                                       @RequestHeader(name = "Authorization") String token) {
+
+        if (!JwtConfig.isAdministrator(token)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
 
         String url = VoterController.BASE_USER_BC_URL + "/chain/" + pollId + "/validate";
 
@@ -129,7 +168,12 @@ public class AdminController {
     }
 
     @PostMapping(path = "/chain/votes/{pollId}")
-    public ResponseEntity checkIfVoterBlockChainIsValid(@PathVariable String pollId) {
+    public ResponseEntity checkIfVoterBlockChainIsValid(@PathVariable String pollId,
+                                                        @RequestHeader(name = "Authorization") String token) {
+
+        if (!JwtConfig.isAdministrator(token)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
 
         String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/validate";
 
