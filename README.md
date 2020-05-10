@@ -145,7 +145,7 @@ Response:
 ### Get vote results
 
 ```
-GET https://vote-block-demo.herokuapp.com/v1/polls/{pollId}/results
+GET https://vote-block-demo.herokuapp.com/v1/polls/{pollId}/raw
 
 Response:
 {
@@ -153,6 +153,26 @@ Response:
  "choiceId": 0,
   ...
 }
+```
+
+### Get vote results as blockchain
+```
+GET https://vote-block-demo.herokuapp.com/v1/polls/{pollId}/results
+
+Response:
+
+[
+    {
+        "_id": "5eb7e36369bc5d3998805cd9",
+        "index": "1",
+        "timestamp": "2020-05-10T11:20:02.948Z",
+        "choiceId": "123",
+        "pollId": "123",
+        "precedingHash": "c50548340988a77b7f1276fdfb5559a5b6b4ea9d0ef065a587001c3f95142ddb",
+        "hash": "70146669955204a7cb88e981b7896e0059146bcc96e35d73633abe8816fd2113"
+    }
+]
+
 ```
 
 ### Get all polls
