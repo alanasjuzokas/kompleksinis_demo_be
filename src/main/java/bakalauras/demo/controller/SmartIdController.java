@@ -1,5 +1,8 @@
 package bakalauras.demo.controller;
 
+import bakalauras.demo.db.UserRepository;
+import bakalauras.demo.entities.Users;
+import bakalauras.demo.entities.domain.Type;
 import bakalauras.demo.web.domain.AuthenticationResponse;
 import bakalauras.demo.web.domain.LoginInitRequest;
 import bakalauras.demo.web.domain.LoginResponse;
@@ -11,6 +14,8 @@ import ee.sk.smartid.AuthenticationHash;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.apache.catalina.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,12 +34,20 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Optional;
 
 import static bakalauras.demo.config.JwtConfig.SIGN_KEY;
 
 @RestController
 @RequestMapping("/v1")
 public class SmartIdController {
+
+    private final UserRepository userRepository;
+
+    @Autowired
+    SmartIdController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @PostMapping(path = "/login")
     SmartIdLoginResponse initSmartId(@RequestBody LoginInitRequest request) {
@@ -64,6 +77,13 @@ public class SmartIdController {
         String url = "https://sid.demo.sk.ee/smart-id-rp/v1/session/" + sessionId;
         AuthenticationResponse authenticationResponse = restTemplate.getForObject(url, AuthenticationResponse.class);
         Subject subject = getSignPerson(authenticationResponse);
+        Type userType = Type.VOTER;
+
+        Optional<Users> user = userRepository.findByPersonCode(subject.getSerialNumber());
+
+        if (user.isPresent()) {
+            userType = user.get().getType();
+        }
 
         Date today = new Date();
         Date tomorrow = new Date(today.getTime() + (1000 * 60 * 60 * 24));
@@ -74,6 +94,7 @@ public class SmartIdController {
                 .setSubject("Demo JWT")
                 .setExpiration(tomorrow)
                 .claim("personCode", subject.getSerialNumber())
+                .claim("role", userType)
                 .signWith(keys)
                 .compact();
 

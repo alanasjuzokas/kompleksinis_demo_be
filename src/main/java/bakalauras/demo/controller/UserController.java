@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/v1")
 @Controller
@@ -60,9 +61,9 @@ public class UserController {
 
     @GetMapping(path = "users/{personCode}")
     public ResponseEntity<Users> getUserByPersonCode(@PathVariable String personCode) {
-        Users users = userRepository.findByPersonCode(personCode);
-        if (users != null) {
-            return new ResponseEntity<>(users, HttpStatus.FOUND);
+        Optional<Users> users = userRepository.findByPersonCode(personCode);
+        if (users.isPresent()) {
+            return new ResponseEntity<>(users.get(), HttpStatus.FOUND);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
