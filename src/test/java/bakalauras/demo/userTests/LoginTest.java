@@ -3,14 +3,12 @@ package bakalauras.demo.userTests;
 import bakalauras.demo.config.JwtConfig;
 import bakalauras.demo.controller.SmartIdController;
 import bakalauras.demo.db.UserRepository;
-import bakalauras.demo.web.domain.CreateRequest;
 import bakalauras.demo.web.domain.LoginInitRequest;
 import bakalauras.demo.web.domain.LoginResponse;
 import bakalauras.demo.web.domain.SmartIdLoginResponse;
 import org.junit.jupiter.api.Test;
 
 import java.security.cert.CertificateException;
-import java.util.Arrays;
 
 import static org.mockito.Mockito.mock;
 
