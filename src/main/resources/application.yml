@@ -7,6 +7,8 @@ spring:
     change-log: classpath:db/changelog/db.changelog.xml
   jpa:
     show-sql: true
+    hibernate:
+      ddl-auto: update
 
   h2:
     console:

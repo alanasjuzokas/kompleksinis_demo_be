@@ -50,4 +50,10 @@
         </sql>
     </changeSet>
 
+    <changeSet author="Alanas" id="3">
+        <sql>
+            INSERT INTO users(id, type, email, person_code) values ('2', 'REQUESTER', 'aaik@admin.lt', '10101010005' )
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
