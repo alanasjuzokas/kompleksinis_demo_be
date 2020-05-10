@@ -44,4 +44,10 @@
         </sql>
     </changeSet>
 
+    <changeSet author="Alanas" id="2">
+        <sql>
+            INSERT INTO users(id, type, email, person_code) values (UUID(), 'ADMINISTRATOR', 'admin@admin.lt', '39711140150' )
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
