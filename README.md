@@ -14,6 +14,11 @@ Payload:
 }
 
 Response:
+{
+ "choiceId": 12,
+ "choiceId": 0,
+  ...
+}
 
 200, 404
 ```
@@ -143,7 +148,11 @@ Response:
 GET https://vote-block-demo.herokuapp.com/v1/polls/{pollId}/results
 
 Response:
-NOT IMPLEMENTED
+{
+ "choiceId": 12,
+ "choiceId": 0,
+  ...
+}
 ```
 
 ### Get all polls
@@ -393,7 +402,7 @@ Payload: {
 }
 
 Response: 200 (if all ok, or user already voted), 422 (if validation failed),
-
+400 (if voting on not started pol))
 ```
 
 ### Validate poll voter blockchain
@@ -405,7 +414,6 @@ Response: 200 (if all ok), 422 (if validation failed),
 
 ```
 
-```
 
 ### Validate poll user blockchain
 

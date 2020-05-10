@@ -10,7 +10,9 @@ public class BlockResponse {
 
     public Instant timestamp;
 
-    public String data;
+    public String choiceId;
+
+    public String pollId;
 
     public String precedingHash;
 

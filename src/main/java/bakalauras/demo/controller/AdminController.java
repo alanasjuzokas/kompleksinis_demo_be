@@ -44,9 +44,9 @@ public class AdminController {
         if (poll.isPresent()) {
             if (poll.get().getStatus() == PollStatus.STARTED) {
                 poll.get().setStatus(PollStatus.STOPPED);
+                pollRepository.save(poll.get());
             }
-            pollRepository.save(poll.get());
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity(new MainController(pollRepository).getVoteResults(request.pollId).getBody(), HttpStatus.OK);
         }
        return new ResponseEntity(HttpStatus.NOT_FOUND);
     }

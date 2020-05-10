@@ -3,6 +3,8 @@ package bakalauras.demo.controller;
 import bakalauras.demo.db.PollRepository;
 import bakalauras.demo.entities.Poll;
 import bakalauras.demo.entities.domain.PollStatus;
+import bakalauras.demo.web.domain.BlockResponse;
+import bakalauras.demo.web.domain.Choice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +12,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -28,8 +37,32 @@ public class MainController {
 
     @GetMapping(path = "polls/{pollId}/results")
     public ResponseEntity getVoteResults(@PathVariable String pollId) {
-        //TODO: results from blockchain implemented
-        return new ResponseEntity(HttpStatus.NOT_IMPLEMENTED);
+
+        String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/results";
+
+        ResponseEntity<BlockResponse[]> response = new RestTemplate().getForEntity(url, BlockResponse[].class);
+
+        List<BlockResponse> blocks = Arrays.asList(response.getBody());
+
+        Poll poll = pollRepository.getOne(pollId);
+
+        List<Choice> choices = poll.getChoices();
+
+        Map<String, Integer> results = new HashMap<>();
+
+        int occur = 0;
+
+        for (Choice numberOfChoice : choices) {
+            for (BlockResponse block : blocks) {
+                if (block.choiceId.equals(numberOfChoice.getId())) {
+                    occur++;
+                }
+            }
+            results.put(numberOfChoice.getId(), occur);
+            occur = 0;
+        }
+
+        return new ResponseEntity(results, HttpStatus.OK);
     }
 
     @GetMapping(path = "/polls")

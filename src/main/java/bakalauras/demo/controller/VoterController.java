@@ -1,6 +1,8 @@
 package bakalauras.demo.controller;
 
 import bakalauras.demo.db.PollRepository;
+import bakalauras.demo.entities.Poll;
+import bakalauras.demo.entities.domain.PollStatus;
 import bakalauras.demo.web.domain.BlockResponse;
 import bakalauras.demo.web.domain.BlockStatus;
 import bakalauras.demo.web.domain.VoteRegisterRequest;
@@ -51,6 +53,12 @@ public class VoterController {
         String personCode = Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token).getBody().get("personCode", String.class);
 
+        Poll poll = pollRepository.getOne(request.pollId);
+
+        if (poll.getStatus() != PollStatus.STARTED) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+
         if (checkIfChainIsValid(BASE_USER_BC_URL, request.pollId) == BlockStatus.NOT_VALID) {
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -61,15 +69,15 @@ public class VoterController {
             return new ResponseEntity(HttpStatus.OK);
         }
 
-        if (registerUserToBlock(personCode, request.pollId) == HttpStatus.BAD_REQUEST) {
-            return new ResponseEntity(HttpStatus.OK);
-        }
-
         if (checkIfChainIsValid(BASE_VOTE_BC_URL, request.pollId) == BlockStatus.NOT_VALID) {
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         if (registerVoteToBlock(request) == HttpStatus.BAD_REQUEST) {
+            return new ResponseEntity(HttpStatus.OK);
+        }
+
+        if (registerUserToBlock(personCode, request.pollId) == HttpStatus.BAD_REQUEST) {
             return new ResponseEntity(HttpStatus.OK);
         }
 
