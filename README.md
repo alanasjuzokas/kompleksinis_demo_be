@@ -120,7 +120,7 @@ Response:
 ### Get requests by status [APPROVED, PENDING, REJECTED]
 
 ```
-GET https://fierce-waters-74037.herokuapp.com/v1/request/{status}
+GET https://vote-block-demo.herokuapp.com/v1/request/{status}
 
 Response:
 [
@@ -387,10 +387,35 @@ Response:
 ```
 POST https://vote-block-demo.herokuapp.com/v1/polls/vote
 
-Response:
-NOT_IMPLEMENTED
+Payload: {
+    "choiceId": "123",
+    "pollId": "123",
+}
+
+Response: 200 (if all ok, or user already voted), 422 (if validation failed),
 
 ```
+
+### Validate poll voter blockchain
+
+```
+POST https://vote-block-demo.herokuapp.com/v1/chain/votes/{pollId}
+
+Response: 200 (if all ok), 422 (if validation failed),
+
+```
+
+```
+
+### Validate poll user blockchain
+
+```
+POST https://vote-block-demo.herokuapp.com/v1/chain/user/{pollId}
+
+Response: 200 (if all ok), 422 (if validation failed),
+
+```
+
 ### Init smart id login
 
 ```

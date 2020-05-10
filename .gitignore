@@ -29,4 +29,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
 /vote_database.trace.db
+#/vote_database.mv.db

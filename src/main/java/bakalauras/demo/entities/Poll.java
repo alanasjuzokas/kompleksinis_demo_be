@@ -2,8 +2,10 @@ package bakalauras.demo.entities;
 
 import bakalauras.demo.config.StringListConverter;
 import bakalauras.demo.entities.domain.PollStatus;
+import bakalauras.demo.web.domain.Choice;
 import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -11,6 +13,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
 
@@ -31,19 +34,18 @@ public class Poll {
     String name;
 
     @Column
-    @Convert(converter = StringListConverter.class)
-    List<String> choices;
+    @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL)
+    List<Choice> choices;
 
     @Column
     String requesterId;
 
     public Poll() {}
 
-    public Poll(Request request) {
+    public Poll(String name, String requesterId) {
         this.status = PollStatus.NOT_STARTED;
-        this.name = request.getName();
-        this.choices = request.getChoices();
-        this.requesterId = request.getRequesterId();
+        this.name = name;
+        this.requesterId = requesterId;
     }
 
     public String getId() {
@@ -66,11 +68,11 @@ public class Poll {
         this.name = name;
     }
 
-    public List<String> getChoices() {
+    public List<Choice> getChoices() {
         return choices;
     }
 
-    public void setChoices(List<String> choices) {
+    public void setChoices(List<Choice> choices) {
         this.choices = choices;
     }
 

@@ -1,5 +1,6 @@
 package bakalauras.demo.web.domain;
 
 public class VoteRequest {
-    String pollId;
+    public String pollId;
+    public String choiceId;
 }

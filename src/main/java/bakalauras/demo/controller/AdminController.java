@@ -6,9 +6,11 @@ import bakalauras.demo.entities.Poll;
 import bakalauras.demo.entities.Request;
 import bakalauras.demo.entities.domain.PollStatus;
 import bakalauras.demo.entities.domain.RequestStatus;
+import bakalauras.demo.web.domain.Choice;
 import bakalauras.demo.web.domain.PollRequest;
 import bakalauras.demo.web.domain.RequestActionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,7 +19,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,8 +70,29 @@ public class AdminController {
         if (request.isPresent()) {
             request.get().setStatus(RequestStatus.APPROVED);
             requestRepository.save(request.get());
-            Poll poll = new Poll(request.get());
+            Poll poll = new Poll(request.get().getName(), request.get().getRequesterId());
+
+            List<String> requestChoices = request.get().getChoices();
+            List<Choice> choices = new ArrayList<>();
+
+            for (String choice : requestChoices) {
+                choices.add(new Choice(choice, poll));
+            }
+
+            poll.setChoices(choices);
+
             pollRepository.save(poll);
+
+            if (registerUserBlockChain(poll.getId()) == HttpStatus.BAD_REQUEST) {
+                pollRepository.delete(poll);
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            if(registerVoterBlockChain(poll.getId()) == HttpStatus.BAD_REQUEST) {
+                pollRepository.delete(poll);
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
             return new ResponseEntity<>(poll, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -92,6 +117,48 @@ public class AdminController {
     @GetMapping(path = "/requests/{status}")
     public ResponseEntity<List<Request>> getRequestsByStatus(@PathVariable RequestStatus status) {
         return new ResponseEntity<>(requestRepository.findAllByStatus(status) , HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/chain/user/{pollId}")
+    public ResponseEntity checkIfUserBlockChainIsValid(@PathVariable String pollId) {
+
+        String url = VoterController.BASE_USER_BC_URL + "/chain/" + pollId + "/validate";
+
+        return new RestTemplate().exchange(url, HttpMethod.POST, null, String.class);
+
+    }
+
+    @PostMapping(path = "/chain/votes/{pollId}")
+    public ResponseEntity checkIfVoterBlockChainIsValid(@PathVariable String pollId) {
+
+        String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/validate";
+
+        return new RestTemplate().exchange(url, HttpMethod.POST, null, String.class);
+    }
+
+
+    private HttpStatus registerUserBlockChain(String pollId) {
+
+        String url = VoterController.BASE_USER_BC_URL + "/chain/create/" + pollId;
+
+        ResponseEntity<String> responseEntity = new RestTemplate().exchange(url, HttpMethod.POST, null, String.class);
+
+        if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
+            return HttpStatus.CREATED;
+        }
+        return HttpStatus.BAD_REQUEST;
+    }
+
+    private HttpStatus registerVoterBlockChain(String pollId) {
+
+        String url = VoterController.BASE_VOTE_BC_URL + "/chain/create/" + pollId;
+
+        ResponseEntity<String> responseEntity = new RestTemplate().exchange(url, HttpMethod.POST, null, String.class);
+
+        if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
+            return HttpStatus.CREATED;
+        }
+        return HttpStatus.BAD_REQUEST;
     }
 
 }

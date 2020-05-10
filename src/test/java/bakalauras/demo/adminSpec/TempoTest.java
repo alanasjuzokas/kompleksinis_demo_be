@@ -28,7 +28,7 @@ public class TempoTest {
 
     private final AdminController controller = new AdminController(requestRepository, pollRepository);
     private List<String> choices = Arrays.asList("Pirmas", "antras");
-    private Poll poll = new Poll(new Request(RequestStatus.APPROVED, "Test", choices, "1" ));
+    private Poll poll = new Poll("Test", "1" );
     private PollRequest request = new PollRequest("1");
 
     @Test

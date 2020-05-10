@@ -33,8 +33,8 @@ import static bakalauras.demo.config.JwtConfig.SIGN_KEY;
 public class VoterController {
 
     private final PollRepository pollRepository;
-    private static final String BASE_USER_BC_URL = "https://blockchain-pno.herokuapp.com";
-    private static final String BASE_VOTE_BC_URL = "https://blockchain-vote1.herokuapp.com";
+    public static final String BASE_USER_BC_URL = "https://blockchain-pno.herokuapp.com";
+    public static final String BASE_VOTE_BC_URL = "https://blockchain-vote1.herokuapp.com";
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Autowired
@@ -51,45 +51,41 @@ public class VoterController {
         String personCode = Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token).getBody().get("personCode", String.class);
 
-        BlockResponse latestUserBlock = getLatestBlock(BASE_USER_BC_URL);
-
-        if (checkIfChainIsValid(BASE_USER_BC_URL, latestUserBlock) == BlockStatus.NOT_VALID) {
+        if (checkIfChainIsValid(BASE_USER_BC_URL, request.pollId) == BlockStatus.NOT_VALID) {
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        VoterStatus voterStatus = checkIfUserVoted(personCode);
+        VoterStatus voterStatus = checkIfUserVoted(personCode, request.pollId);
 
         if (voterStatus == VoterStatus.VOTED) {
             return new ResponseEntity(HttpStatus.OK);
         }
 
-        if (registerUserToBlock(personCode) == HttpStatus.BAD_REQUEST) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        if (registerUserToBlock(personCode, request.pollId) == HttpStatus.BAD_REQUEST) {
+            return new ResponseEntity(HttpStatus.OK);
         }
 
-        BlockResponse latestVoteBlock = getLatestBlock(BASE_VOTE_BC_URL);
-
-        if (checkIfChainIsValid(BASE_VOTE_BC_URL, latestVoteBlock) == BlockStatus.NOT_VALID) {
+        if (checkIfChainIsValid(BASE_VOTE_BC_URL, request.pollId) == BlockStatus.NOT_VALID) {
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        if (registerVoteToBlock(personCode) == HttpStatus.BAD_REQUEST) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        if (registerVoteToBlock(request) == HttpStatus.BAD_REQUEST) {
+            return new ResponseEntity(HttpStatus.OK);
         }
 
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    private BlockResponse getLatestBlock(String baseUrl) {
-        String url = baseUrl + "/block/latest";
+    private BlockResponse getLatestBlock(String baseUrl, String pollId) {
+        String url = baseUrl + "/chain/" + pollId +  "/block/latest";
 
         return restTemplate.getForObject(url, BlockResponse.class);
     }
 
-    private BlockStatus checkIfChainIsValid(String baseUrl, BlockResponse block) {
-        String url = baseUrl + "/block/validate";
+    private BlockStatus checkIfChainIsValid(String baseUrl, String pollId) {
+        String url = baseUrl + "/chain/" + pollId + "/validate";
 
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(block), String.class);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, null, String.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
             return BlockStatus.VALID;
@@ -98,9 +94,9 @@ public class VoterController {
         return BlockStatus.NOT_VALID;
     }
 
-    private VoterStatus checkIfUserVoted(String personCode) {
+    private VoterStatus checkIfUserVoted(String personCode, String pollId) {
 
-        String url = BASE_USER_BC_URL + "/block/check/" + personCode;
+        String url = BASE_USER_BC_URL + "/chain/" + pollId + "/check/" + personCode;
 
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
@@ -115,9 +111,9 @@ public class VoterController {
         return VoterStatus.HAS_NOT_YET_VOTED;
     }
 
-    private HttpStatus registerUserToBlock(String personCode) {
+    private HttpStatus registerUserToBlock(String personCode, String pollId) {
 
-        String url = BASE_USER_BC_URL + "/block/register";
+        String url = BASE_USER_BC_URL + "/chain/" + pollId + "/block/register";
 
         VoterRegisterRequest request = new VoterRegisterRequest(personCode);
 
@@ -129,11 +125,11 @@ public class VoterController {
         return HttpStatus.BAD_REQUEST;
     }
 
-    private HttpStatus registerVoteToBlock(String personCode) {
+    private HttpStatus registerVoteToBlock(VoteRequest request) {
 
-        String url = BASE_VOTE_BC_URL + "/block/register";
+        String url = BASE_VOTE_BC_URL + "/chain/" + request.pollId + "/block/register";
 
-        VoteRegisterRequest registerRequest = new VoteRegisterRequest(personCode);
+        VoteRegisterRequest registerRequest = new VoteRegisterRequest(request.pollId, request.choiceId);
 
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(registerRequest), String.class);
         if (response.getStatusCode() == HttpStatus.CREATED) {
