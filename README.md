@@ -246,7 +246,6 @@ Payload:
     	"choices": [
     		"pirmas choice", "antras choice"
     	],
-    	"requesterId": "3cf21fbe-9614-4b71-bc71-2f26d3f3d5f7"
     }
 
 

@@ -8,7 +8,11 @@ import bakalauras.demo.entities.Request;
 import bakalauras.demo.entities.Users;
 import bakalauras.demo.entities.domain.CreateRequester;
 import bakalauras.demo.entities.domain.RequestStatus;
+import bakalauras.demo.entities.domain.Type;
 import bakalauras.demo.web.domain.CreateRequest;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +21,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.crypto.SecretKey;
 import java.util.List;
 import java.util.Optional;
+
+import static bakalauras.demo.config.JwtConfig.SIGN_KEY;
 
 @RequestMapping("/v1")
 @Controller
@@ -40,12 +48,34 @@ public class UserController {
     }
 
     @PostMapping(path = "requests/create")
-    public ResponseEntity<Request> createRequest(@RequestBody CreateRequest createRequest) {
+    public ResponseEntity<Request> createRequest(@RequestBody CreateRequest createRequest,
+                                                 @RequestHeader(name = "Authorization") String token) {
+
+        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SIGN_KEY));
+
+        String personCode = Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token).getBody().get("personCode", String.class);
+
+        String role = Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token).getBody().get("role", String.class);
+
+        String requesterId = "";
+
+        if (role.equals(Type.REQUESTER.toString())) {
+            Optional<Users> user = userRepository.findByPersonCode(personCode);
+            if (user.isPresent()) {
+                requesterId = user.get().getId();
+            }
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         Request request = new Request(
                 RequestStatus.PENDING,
                 createRequest.name,
                 createRequest.choices,
-                createRequest.requesterId
+                requesterId
         );
 
         requestRepository.save(request);
