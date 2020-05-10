@@ -29,4 +29,11 @@ public class JwtConfig {
       return role.equals(Type.REQUESTER.toString());
    }
 
+   public static String getRole(String token) {
+      SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SIGN_KEY));
+
+      return Jwts.parserBuilder().setSigningKey(key).build()
+              .parseClaimsJws(token).getBody().get("role", String.class);
+   }
+
 }

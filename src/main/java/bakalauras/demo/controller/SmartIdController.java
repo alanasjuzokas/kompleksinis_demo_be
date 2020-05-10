@@ -45,12 +45,12 @@ public class SmartIdController {
     private final UserRepository userRepository;
 
     @Autowired
-    SmartIdController(UserRepository userRepository) {
+    public SmartIdController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @PostMapping(path = "/login")
-    SmartIdLoginResponse initSmartId(@RequestBody LoginInitRequest request) {
+    public SmartIdLoginResponse initSmartId(@RequestBody LoginInitRequest request) {
 
         AuthenticationHash authenticationHash = AuthenticationHash.generateRandomHash();
 
@@ -72,7 +72,7 @@ public class SmartIdController {
     }
 
     @GetMapping(path = "/login/{sessionId}")
-    LoginResponse smartIdLogin(@PathVariable String sessionId) throws CertificateException {
+    public LoginResponse smartIdLogin(@PathVariable String sessionId) throws CertificateException {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://sid.demo.sk.ee/smart-id-rp/v1/session/" + sessionId;
         AuthenticationResponse authenticationResponse = restTemplate.getForObject(url, AuthenticationResponse.class);

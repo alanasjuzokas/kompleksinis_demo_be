@@ -46,7 +46,7 @@ public class AdminController {
         if (!JwtConfig.isAdministrator(token)) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
-
+        
         Optional<Poll> poll = pollRepository.findById(request.getPollId());
         if (poll.isPresent()) {
             if (poll.get().getStatus() == PollStatus.STARTED) {
@@ -171,9 +171,7 @@ public class AdminController {
     public ResponseEntity checkIfVoterBlockChainIsValid(@PathVariable String pollId,
                                                         @RequestHeader(name = "Authorization") String token) {
 
-        if (!JwtConfig.isAdministrator(token)) {
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-        }
+
 
         String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/validate";
 
