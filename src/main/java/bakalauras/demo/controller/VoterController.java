@@ -65,22 +65,21 @@ public class VoterController {
 
         VoterStatus voterStatus = checkIfUserVoted(personCode, request.pollId);
 
-//        if (voterStatus == VoterStatus.VOTED) {
-//            return new ResponseEntity(HttpStatus.OK);
-//        }
+        if (voterStatus == VoterStatus.VOTED) {
+            return new ResponseEntity(HttpStatus.OK);
+        }
 
-//        if (checkIfChainIsValid(BASE_VOTE_BC_URL, request.pollId) == BlockStatus.NOT_VALID) {
-//            return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
-//        }
+        if (checkIfChainIsValid(BASE_VOTE_BC_URL, request.pollId) == BlockStatus.NOT_VALID) {
+            return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
 
-//        if (registerVoteToBlock(request) == HttpStatus.BAD_REQUEST) {
-//            return new ResponseEntity(HttpStatus.OK);
-//        }
+        if (registerVoteToBlock(request) == HttpStatus.BAD_REQUEST) {
+            return new ResponseEntity(HttpStatus.OK);
+        }
 
-//        if (registerUserToBlock(personCode, request.pollId) == HttpStatus.BAD_REQUEST) {
-//            return new ResponseEntity(HttpStatus.OK);
-//        }
-        registerVoteToBlock(request);
+        if (registerUserToBlock(personCode, request.pollId) == HttpStatus.BAD_REQUEST) {
+            return new ResponseEntity(HttpStatus.OK);
+        }
 
         return new ResponseEntity(HttpStatus.OK);
     }
