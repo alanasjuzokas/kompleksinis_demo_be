@@ -68,10 +68,14 @@ public class MainController {
 
     @GetMapping(path = "polls/{pollId}/raw")
     public ResponseEntity getRawResults(@PathVariable String pollId) {
-        String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/results";
+        Optional<Poll> poll = pollRepository.findById(pollId);
+        if (poll.isPresent() && poll.get().getStatus() == PollStatus.STOPPED) {
+            String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/results";
 
-        ResponseEntity<BlockResponse[]> response = new RestTemplate().getForEntity(url, BlockResponse[].class);
-        return new ResponseEntity(response.getBody(), HttpStatus.OK);
+            ResponseEntity<BlockResponse[]> response = new RestTemplate().getForEntity(url, BlockResponse[].class);
+            return new ResponseEntity(response.getBody(), HttpStatus.OK);
+        }
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping(path = "/polls")
