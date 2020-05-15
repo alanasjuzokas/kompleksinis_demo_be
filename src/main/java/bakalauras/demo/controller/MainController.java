@@ -35,39 +35,47 @@ public class MainController {
     @GetMapping(path = "polls/{pollId}/results")
     public ResponseEntity getVoteResults(@PathVariable String pollId) {
 
-        String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/results";
-
-        ResponseEntity<BlockResponse[]> response = new RestTemplate().getForEntity(url, BlockResponse[].class);
-
-        List<BlockResponse> blocks = Arrays.asList(response.getBody());
-
         Poll poll = pollRepository.getOne(pollId);
 
-        List<Choice> choices = poll.getChoices();
+        if (poll.getStatus() == PollStatus.STOPPED) {
+            String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/results";
 
-        Map<String, Integer> results = new HashMap<>();
+            ResponseEntity<BlockResponse[]> response = new RestTemplate().getForEntity(url, BlockResponse[].class);
 
-        int occur = 0;
+            List<BlockResponse> blocks = Arrays.asList(response.getBody());
 
-        for (Choice numberOfChoice : choices) {
-            for (BlockResponse block : blocks) {
-                if (block.choiceId.equals(numberOfChoice.getId())) {
-                    occur++;
+            List<Choice> choices = poll.getChoices();
+
+            Map<String, Integer> results = new HashMap<>();
+
+            int occur = 0;
+
+            for (Choice numberOfChoice : choices) {
+                for (BlockResponse block : blocks) {
+                    if (block.choiceId.equals(numberOfChoice.getId())) {
+                        occur++;
+                    }
                 }
+                results.put(numberOfChoice.getBody(), occur);
+                occur = 0;
             }
-            results.put(numberOfChoice.getId(), occur);
-            occur = 0;
+
+            return new ResponseEntity(results, HttpStatus.OK);
         }
 
-        return new ResponseEntity(results, HttpStatus.OK);
+       return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping(path = "polls/{pollId}/raw")
     public ResponseEntity getRawResults(@PathVariable String pollId) {
-        String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/results";
+        Optional<Poll> poll = pollRepository.findById(pollId);
+        if (poll.isPresent() && poll.get().getStatus() == PollStatus.STOPPED) {
+            String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/results";
 
-        ResponseEntity<BlockResponse[]> response = new RestTemplate().getForEntity(url, BlockResponse[].class);
-        return new ResponseEntity(response.getBody(), HttpStatus.OK);
+            ResponseEntity<BlockResponse[]> response = new RestTemplate().getForEntity(url, BlockResponse[].class);
+            return new ResponseEntity(response.getBody(), HttpStatus.OK);
+        }
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping(path = "/polls")
