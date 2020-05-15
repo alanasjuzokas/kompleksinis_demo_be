@@ -99,6 +99,8 @@ public class AdminController {
 
             poll.setChoices(choices);
 
+            poll.setStatus(PollStatus.STARTED);
+
             pollRepository.save(poll);
 
             if (registerUserBlockChain(poll.getId()) == HttpStatus.BAD_REQUEST) {
