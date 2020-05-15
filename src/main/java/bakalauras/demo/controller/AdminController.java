@@ -97,7 +97,10 @@ public class AdminController {
                 choices.add(new Choice(choice, poll));
             }
 
+
             poll.setChoices(choices);
+
+            poll.setStatus(PollStatus.STARTED);
 
             pollRepository.save(poll);
 
