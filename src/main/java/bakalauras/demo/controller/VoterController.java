@@ -121,7 +121,7 @@ public class VoterController {
 
     private HttpStatus registerUserToBlock(String personCode, String pollId) {
 
-        String url = BASE_USER_BC_URL + "/chain/" + pollId + "/block/register";
+        String url = BASE_VOTE_BC_URL + "/chain/" + pollId + "/block/register";
 
         VoterRegisterRequest request = new VoterRegisterRequest(personCode);
 
