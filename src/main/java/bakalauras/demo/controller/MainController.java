@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
@@ -67,10 +68,12 @@ public class MainController {
     }
 
     @GetMapping(path = "polls/{pollId}/raw")
-    public ResponseEntity getRawResults(@PathVariable String pollId) {
+    public ResponseEntity getRawResults(@RequestParam(required = true) String limit,
+                                        @RequestParam(required = true) String skip,
+                                        @PathVariable String pollId) {
         Optional<Poll> poll = pollRepository.findById(pollId);
         if (poll.isPresent() && poll.get().getStatus() == PollStatus.STOPPED) {
-            String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/results";
+            String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/results?limit=" + limit + "&?skip=" + skip;
 
             ResponseEntity<BlockResponse[]> response = new RestTemplate().getForEntity(url, BlockResponse[].class);
             return new ResponseEntity(response.getBody(), HttpStatus.OK);

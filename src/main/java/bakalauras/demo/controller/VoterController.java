@@ -45,9 +45,9 @@ public class VoterController {
     }
 
     @PostMapping(path = "polls/vote")
-    public ResponseEntity vote(@RequestBody VoteRequest request, @RequestHeader(name = "Authorization") String token) {
-
-
+    public ResponseEntity vote(@RequestBody VoteRequest request,
+                               @RequestHeader(name = "Authorization") String token) {
+        
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SIGN_KEY));
 
         String personCode = Jwts.parserBuilder().setSigningKey(key).build()
