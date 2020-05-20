@@ -73,7 +73,7 @@ public class MainController {
                                         @PathVariable String pollId) {
         Optional<Poll> poll = pollRepository.findById(pollId);
         if (poll.isPresent() && poll.get().getStatus() == PollStatus.STOPPED) {
-            String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/results?limit=" + limit + "&?skip=" + skip;
+            String url = VoterController.BASE_VOTE_BC_URL + "/chain/" + pollId + "/results?limit=" + limit + "&skip=" + skip;
 
             ResponseEntity<BlockResponse[]> response = new RestTemplate().getForEntity(url, BlockResponse[].class);
             return new ResponseEntity(response.getBody(), HttpStatus.OK);
