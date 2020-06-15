@@ -68,31 +68,4 @@
         </createTable>
     </changeSet>
 
-<!--    <changeSet author="Alanas" id="4">-->
-<!--        <sql>-->
-<!--            INSERT INTO requests(id, status, name, choices, requester_id) values ('1', 'PENDING','test', 'pirmas;antras', '2');-->
-<!--            INSERT INTO requests(id, status, name, choices, requester_id) values ('2', 'APPROVED','test2', 'pirmas;antras', '2');-->
-<!--            INSERT INTO requests(id, status, name, choices, requester_id) values ('3', 'REJECTED','test3', 'pirmas;antras', '2');-->
-<!--            INSERT INTO requests(id, status, name, choices, requester_id) values ('4', 'PENDING','test4', 'pirmas;antras', '2');-->
-<!--        </sql>-->
-<!--    </changeSet>-->
-
-<!--    <changeSet author="Alanas" id="5">-->
-<!--        <sql>-->
-<!--            INSERT INTO requests(id, status, name, choices, requester_id) values ('5', 'PENDING','test5', 'pirmas;antras', '3');-->
-<!--            INSERT INTO requests(id, status, name, choices, requester_id) values ('6', 'APPROVED','test6', 'pirmas;antras', '3');-->
-<!--            INSERT INTO requests(id, status, name, choices, requester_id) values ('7', 'REJECTED','test7', 'pirmas;antras', '3');-->
-<!--            INSERT INTO requests(id, status, name, choices, requester_id) values ('8', 'PENDING','test8', 'pirmas;antras', '3');-->
-
-<!--            INSERT INTO polls(id, status, name, choices, requester_id) values ('1', 'NOT_STARTED','test5', 'pirmas;antras', '2');-->
-<!--            INSERT INTO polls(id, status, name, choices, requester_id) values ('2', 'STARTED','test6', 'pirmas;antras', '2');-->
-<!--            INSERT INTO polls(id, status, name, choices, requester_id) values ('3', 'STOPPED','test7', 'pirmas;antras', '2');-->
-<!--            INSERT INTO polls(id, status, name, choices, requester_id) values ('4', 'NOT_STARTED','test8', 'pirmas;antras', '2');-->
-<!--            INSERT INTO polls(id, status, name, choices, requester_id) values ('5', 'STARTED','test5', 'pirmas;antras', '3');-->
-<!--            INSERT INTO polls(id, status, name, choices, requester_id) values ('6', 'STOPPED','test6', 'pirmas;antras', '3');-->
-<!--            INSERT INTO polls(id, status, name, choices, requester_id) values ('7', 'NOT_STARTED','test7', 'pirmas;antras', '3');-->
-<!--            INSERT INTO polls(id, status, name, choices, requester_id) values ('8', 'NOT_STARTED','test8', 'pirmas;antras', '3');-->
-<!--        </sql>-->
-<!--    </changeSet>-->
-
 </databaseChangeLog>

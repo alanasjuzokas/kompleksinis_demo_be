@@ -53,7 +53,6 @@ public class SmartIdController {
 
         AuthenticationHash authenticationHash = AuthenticationHash.generateRandomHash();
 
-        //Instead of manual hash calculating, SmartID calculation is given in JAR
         String verificationCode = authenticationHash.calculateVerificationCode();
 
         RestTemplate restTemplate = new RestTemplate();
@@ -122,22 +121,6 @@ public class SmartIdController {
             }
         }
         return new Subject( name, personCode, surname);
-    }
-
-    private byte[] calculateHash() throws NoSuchAlgorithmException {
-        SecureRandom random = new SecureRandom();
-
-        byte randBytes[] = new byte[64];
-
-        random.nextBytes(randBytes);
-
-        MessageDigest md = MessageDigest.getInstance("SHA-512");
-
-        md.update(randBytes);
-
-        byte[] hash = md.digest();
-
-        return org.apache.tomcat.util.codec.binary.Base64.encodeBase64(hash);
     }
 
 }
